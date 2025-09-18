@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/antarikshc-perfetto-mcp-badge.png)](https://mseep.ai/app/antarikshc-perfetto-mcp)
+
 # Perfetto MCP
 
 This is a Model Context Protocol (MCP) server that gets answers from your Perfetto Traces. It turns natural‑language prompts into focused Perfetto analyses so you can quickly explain jank, diagnose ANRs, spot CPU hot threads, uncover lock contention, and find memory leaks — without writing SQL. Point it at a trace and process, ask a question, and receive concise, actionable summaries with structured results you can drill into.
