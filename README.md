@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/antarikshc-perfetto-mcp-badge.png)](https://mseep.ai/app/antarikshc-perfetto-mcp)
+
 # Perfetto MCP
 
 > Turn natural language into powerful Perfetto trace analysis
