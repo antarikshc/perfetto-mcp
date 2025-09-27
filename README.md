@@ -32,7 +32,7 @@ A Model Context Protocol (MCP) server that transforms natural-language prompts i
 <details>
 <summary><strong>Cursor</strong></summary>
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=perfetto-mcp&config=eyJjb21tYW5kIjoidXZ4IHBlcmZldHRvLW1jcCJ9)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=perfetto-mcp&config=eyJjb21tYW5kIjoidXZ4IHBlcmZldHRvLW1jcCJ9)
 
 Or add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
 
