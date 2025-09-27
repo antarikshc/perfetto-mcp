@@ -1,3 +1,5 @@
+![showcase](./static/perfetto-mcp-logo.jpg)
+
 # Perfetto MCP
 
 > Turn natural language into powerful Perfetto trace analysis
@@ -12,7 +14,7 @@ A Model Context Protocol (MCP) server that transforms natural-language prompts i
 - **Thread Contention**: Find synchronization bottlenecks and lock contention
 - **Binder Profiling**: Analyze IPC performance and slow system interactions
 
-![til](./static/Perfetto-mcp-showcase.gif)
+![showcase](./static/Perfetto-mcp-showcase.gif)
 
 ## 📋 Prerequisites
 
@@ -30,7 +32,7 @@ A Model Context Protocol (MCP) server that transforms natural-language prompts i
 <details>
 <summary><strong>Cursor</strong></summary>
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=perfetto-mcp&config=eyJjb21tYW5kIjoidXZ4IHBlcmZldHRvLW1jcCJ9)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=perfetto-mcp&config=eyJjb21tYW5kIjoidXZ4IHBlcmZldHRvLW1jcCJ9)
 
 Or add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
 
