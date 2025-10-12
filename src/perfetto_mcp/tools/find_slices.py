@@ -20,7 +20,7 @@ class SliceFinderTool(BaseTool):
         pattern: str,
         process_name: Optional[str] = None,
         match_mode: str = "contains",
-        limit: int = 100,
+        limit: int = 50,
         main_thread_only: bool = False,
         time_range: Optional[Dict[str, float | int]] = None,
     ) -> str:
@@ -31,7 +31,7 @@ class SliceFinderTool(BaseTool):
             pattern: Slice name pattern to match. Required and non-empty.
             process_name: Optional process name filter. Supports wildcards ('*' or '%').
             match_mode: One of {'contains', 'exact', 'glob'}. Defaults to 'contains'.
-            limit: Max number of example slices to return (1..500). Defaults to 100.
+            limit: Max number of example slices to return (1..50). Defaults to 50.
             main_thread_only: If true, only include slices from process main threads.
             time_range: Optional dict with {'start_ms': X, 'end_ms': Y} bounds.
 
