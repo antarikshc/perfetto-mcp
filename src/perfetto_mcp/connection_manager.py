@@ -1,11 +1,15 @@
 """Connection manager for persistent TraceProcessor connections."""
 
-import threading
 import logging
+import os
+import threading
 from typing import Optional
-from perfetto.trace_processor import TraceProcessor
+
+from perfetto.trace_processor import TraceProcessor, TraceProcessorConfig
 
 logger = logging.getLogger(__name__)
+
+TRACE_PROCESSOR_BIN_PATH_ENV = "PERFETTO_MCP_TRACE_PROCESSOR_BIN_PATH"
 
 
 class ConnectionManager:
@@ -15,6 +19,17 @@ class ConnectionManager:
         self._current_trace_path: Optional[str] = None
         self._current_connection: Optional[TraceProcessor] = None
         self._lock = threading.Lock()  # Thread safety
+        self._trace_processor_bin_path = self._read_trace_processor_bin_path()
+
+    def _read_trace_processor_bin_path(self) -> Optional[str]:
+        """Read optional trace processor binary path from environment."""
+        raw_bin_path = os.getenv(TRACE_PROCESSOR_BIN_PATH_ENV)
+        if raw_bin_path is None:
+            return None
+
+        # Normalize common quoted env var forms and ignore empty values.
+        normalized = raw_bin_path.strip().strip('"').strip("'")
+        return normalized if normalized else None
         
     def get_connection(self, trace_path: str) -> TraceProcessor:
         """Get or create connection for trace_path with automatic reconnection.
@@ -63,7 +78,10 @@ class ConnectionManager:
             ConnectionError: If connection fails
         """
         try:
-            tp = TraceProcessor(trace=trace_path)
+            tp = TraceProcessor(
+                trace=trace_path,
+                config=TraceProcessorConfig(bin_path=self._trace_processor_bin_path),
+            )
             logger.info(f"Successfully connected to trace: {trace_path}")
             return tp
         except FileNotFoundError as e:
@@ -74,6 +92,11 @@ class ConnectionManager:
             )
         except Exception as e:
             logger.error(f"Failed to connect to trace: {trace_path}, error: {e}")
+            if self._trace_processor_bin_path:
+                raise ConnectionError(
+                    "Could not connect to trace processor with configured "
+                    f"{TRACE_PROCESSOR_BIN_PATH_ENV}={self._trace_processor_bin_path}: {e}"
+                )
             raise ConnectionError(f"Could not connect to trace processor: {e}")
     
     def _is_connection_healthy(self) -> bool:
