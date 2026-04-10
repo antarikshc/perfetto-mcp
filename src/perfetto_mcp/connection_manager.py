@@ -94,8 +94,8 @@ class ConnectionManager:
                 raise ConnectionError(
                     "Could not connect to trace processor with configured "
                     f"{TRACE_PROCESSOR_BIN_PATH_ENV}={self._trace_processor_bin_path}: {e}"
-                )
-            raise ConnectionError(f"Could not connect to trace processor: {e}")
+                ) from e
+            raise ConnectionError(f"Could not connect to trace processor: {e}") from e
     
     def _reconnect(self, trace_path: str) -> TraceProcessor:
         """Reconnect to trace file after connection failure.
