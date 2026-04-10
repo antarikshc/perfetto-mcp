@@ -560,7 +560,7 @@ wheels = [
 
 [[package]]
 name = "perfetto-mcp"
-version = "0.1.3"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "build" },
