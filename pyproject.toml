@@ -1,6 +1,6 @@
 [project]
 name = "perfetto-mcp"
-version = "0.1.3"
+version = "0.1.4"
 description = "A Model Context Protocol server for analyzing Perfetto trace files."
 readme = "README.md"
 requires-python = ">=3.10"
