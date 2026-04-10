@@ -109,6 +109,41 @@ args = ["perfetto-mcp"]
 
 </details>
 
+### Optional: Use a Local `trace_processor_shell` Binary
+
+If your network environment blocks downloads, set
+`PERFETTO_MCP_TRACE_PROCESSOR_BIN_PATH` to an absolute path of a local
+`trace_processor_shell` binary.
+
+When this env var is set, `perfetto-mcp` uses that binary directly.
+When it is not set, default `perfetto` Python behavior is unchanged.
+
+Example (`mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "perfetto-mcp": {
+      "command": "uvx",
+      "args": ["perfetto-mcp"],
+      "env": {
+        "PERFETTO_MCP_TRACE_PROCESSOR_BIN_PATH": "D:/tools/perfetto/trace_processor_shell.exe"
+      }
+    }
+  }
+}
+```
+
+Example (`~/.codex/config.toml`):
+
+```toml
+[mcp_servers.perfetto-mcp]
+command = "uvx"
+args = ["perfetto-mcp"]
+[mcp_servers.perfetto-mcp.env]
+PERFETTO_MCP_TRACE_PROCESSOR_BIN_PATH = "D:/tools/perfetto/trace_processor_shell.exe"
+```
+
 ### Local Install (development server)
 
 ```bash
