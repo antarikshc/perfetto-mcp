@@ -68,7 +68,7 @@ class JankFramesTool(BaseTool):
             if severity_filter:
                 try:
                     # Escape values and build an IN (...) list
-                    safe_vals = [f"'{str(v).replace("'", "''")}'" for v in severity_filter]
+                    safe_vals = ["'%s'" % str(v).replace("'", "''") for v in severity_filter]
                     severity_clause = f" AND atl.jank_severity_type IN ({', '.join(safe_vals)})"
                 except Exception:
                     raise ToolError("INVALID_PARAMETERS", "severity_filter must be a list of strings")
@@ -150,7 +150,7 @@ class JankFramesTool(BaseTool):
                 )
                 fallback_severity_clause = ""
                 if severity_filter:
-                    safe_vals = [f"'{str(v).replace("'", "''")}'" for v in severity_filter]
+                    safe_vals = ["'%s'" % str(v).replace("'", "''") for v in severity_filter]
                     fallback_severity_clause = (
                         f" AND a.jank_severity_type IN ({', '.join(safe_vals)})"
                     )
