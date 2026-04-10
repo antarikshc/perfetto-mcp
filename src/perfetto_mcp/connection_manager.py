@@ -3,7 +3,7 @@
 import threading
 import logging
 from typing import Optional
-from perfetto.trace_processor import TraceProcessor
+from perfetto.trace_processor import TraceProcessor, TraceProcessorConfig
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +41,7 @@ class ConnectionManager:
             elif self._current_connection is None:
                 logger.info(f"Creating new connection to {trace_path}")
                 self._current_connection = self._create_connection(trace_path)
-                
-            # Test connection health before returning
-            if not self._is_connection_healthy():
-                logger.warning(f"Connection to {trace_path} appears unhealthy, reconnecting")
-                self._current_connection = self._reconnect_unsafe(trace_path)
-                
+
             return self._current_connection
     
     def _create_connection(self, trace_path: str) -> TraceProcessor:
@@ -63,7 +58,8 @@ class ConnectionManager:
             ConnectionError: If connection fails
         """
         try:
-            tp = TraceProcessor(trace=trace_path)
+            config = TraceProcessorConfig(load_timeout=30)
+            tp = TraceProcessor(trace=trace_path, config=config)
             logger.info(f"Successfully connected to trace: {trace_path}")
             return tp
         except FileNotFoundError as e:
@@ -75,25 +71,6 @@ class ConnectionManager:
         except Exception as e:
             logger.error(f"Failed to connect to trace: {trace_path}, error: {e}")
             raise ConnectionError(f"Could not connect to trace processor: {e}")
-    
-    def _is_connection_healthy(self) -> bool:
-        """Check if the current connection is healthy.
-        
-        Returns:
-            bool: True if connection is healthy, False otherwise
-        """
-        if self._current_connection is None:
-            return False
-            
-        try:
-            # Try a simple query to test connection health
-            qr_it = self._current_connection.query('SELECT 1 as test_query LIMIT 1;')
-            # Consume the iterator to ensure query executes
-            list(qr_it)
-            return True
-        except Exception as e:
-            logger.warning(f"Connection health check failed: {e}")
-            return False
     
     def _reconnect(self, trace_path: str) -> TraceProcessor:
         """Reconnect to trace file after connection failure.
