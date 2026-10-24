@@ -45,15 +45,17 @@ class BaseTool:
             Exception: Any other errors from the operation
         """
         try:
-            tp = self.connection_manager.get_connection(trace_path)
-            return operation(tp)
+            return self.connection_manager.run_with_connection(trace_path, operation)
         except (ConnectionError, Exception) as e:
             # Check if this is a connection-related error that might benefit from reconnection
             if self._should_retry_on_error(e):
                 logger.info(f"Attempting reconnection due to error: {e}")
                 try:
-                    tp = self.connection_manager._reconnect(trace_path)
-                    return operation(tp)
+                    return self.connection_manager.run_with_connection(
+                        trace_path,
+                        operation,
+                        reconnect=True,
+                    )
                 except Exception as reconnect_error:
                     logger.error(f"Reconnection attempt failed: {reconnect_error}")
                     # Raise the original error if reconnection fails

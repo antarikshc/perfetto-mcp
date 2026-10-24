@@ -3,13 +3,15 @@
 import logging
 import os
 import threading
-from typing import Optional
+from collections.abc import Callable
+from typing import Optional, TypeVar
 
 from perfetto.trace_processor import TraceProcessor, TraceProcessorConfig
 
 logger = logging.getLogger(__name__)
 
 TRACE_PROCESSOR_BIN_PATH_ENV = "PERFETTO_MCP_TRACE_PROCESSOR_BIN_PATH"
+ResultT = TypeVar("ResultT")
 
 
 class ConnectionManager:
@@ -32,32 +34,61 @@ class ConnectionManager:
         return normalized if normalized else None
         
     def get_connection(self, trace_path: str) -> TraceProcessor:
-        """Get or create connection for trace_path with automatic reconnection.
-        
+        """Get or create the active connection for trace_path.
+
+        The returned connection is not protected after this method returns. Use
+        ``run_with_connection`` to serialize operations with other tool calls.
+
         Args:
             trace_path: Path to the Perfetto trace file
-            
+
         Returns:
             TraceProcessor: Active connection to the trace
-            
+
         Raises:
             FileNotFoundError: If trace file doesn't exist
             ConnectionError: If connection fails
         """
         with self._lock:
-            # If different path, close existing and open new
-            if self._current_trace_path != trace_path:
-                logger.info(f"Switching trace connection from {self._current_trace_path} to {trace_path}")
-                self._close_current_unsafe()
-                self._current_trace_path = trace_path
-                self._current_connection = self._create_connection(trace_path)
-                
-            # If same path but no connection, create new one
-            elif self._current_connection is None:
-                logger.info(f"Creating new connection to {trace_path}")
-                self._current_connection = self._create_connection(trace_path)
+            return self._get_connection_unsafe(trace_path)
 
-            return self._current_connection
+    def run_with_connection(
+        self,
+        trace_path: str,
+        operation: Callable[[TraceProcessor], ResultT],
+        *,
+        reconnect: bool = False,
+    ) -> ResultT:
+        """Run an operation while holding the lock for the shared connection.
+
+        The manager owns one current trace connection. Keeping the lock through
+        the operation prevents another tool call from switching traces and
+        closing the processor while it is in use.
+        """
+        with self._lock:
+            connection = (
+                self._reconnect_unsafe(trace_path)
+                if reconnect
+                else self._get_connection_unsafe(trace_path)
+            )
+            return operation(connection)
+
+    def _get_connection_unsafe(self, trace_path: str) -> TraceProcessor:
+        """Get or create a connection while the manager lock is held."""
+        if self._current_trace_path != trace_path:
+            logger.info(
+                "Switching trace connection from %s to %s",
+                self._current_trace_path,
+                trace_path,
+            )
+            self._close_current_unsafe()
+            self._current_trace_path = trace_path
+            self._current_connection = self._create_connection(trace_path)
+        elif self._current_connection is None:
+            logger.info("Creating new connection to %s", trace_path)
+            self._current_connection = self._create_connection(trace_path)
+
+        return self._current_connection
     
     def _create_connection(self, trace_path: str) -> TraceProcessor:
         """Create a new TraceProcessor connection.
